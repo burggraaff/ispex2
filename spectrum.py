@@ -1,6 +1,6 @@
 import numpy as np
 from sys import argv
-from spectacle import plot, io, wavelength, raw2
+from spectacle import plot, io, wavelength, raw2, general
 from ispex import general as ispex_general
 from matplotlib import pyplot as plt
 from pathlib import Path
@@ -37,6 +37,9 @@ wavelengths_split_Qm,_ = raw2.pull_apart(wavelengths_Qm, bayer_Qm)
 RGBG_Qp,_ = raw2.pull_apart(data_Qp, bayer_Qp)
 RGBG_Qm,_ = raw2.pull_apart(data_Qm, bayer_Qm)
 
+RGBG_Qp = general.gauss_nan(RGBG_Qp, sigma=(0,0,5))
+RGBG_Qm = general.gauss_nan(RGBG_Qm, sigma=(0,0,5))
+
 lambdarange, all_interpolated_Qp = wavelength.interpolate_multi(wavelengths_split_Qp, RGBG_Qp)
 lambdarange, all_interpolated_Qm = wavelength.interpolate_multi(wavelengths_split_Qm, RGBG_Qm)
 
@@ -53,6 +56,10 @@ plt.xlabel("Wavelength [nm]")
 plt.ylabel("Counts [ADU]")
 plt.savefig(Path("results")/f"{file.stem}_row_Qm.pdf", bbox_inches="tight")
 plt.close()
+
+# Single wavelength
+j = 50
+plt.plot(all_interpolated_Qp[2,j,:])
 
 stacked_Qp = wavelength.stack(lambdarange, all_interpolated_Qp)
 stacked_Qm = wavelength.stack(lambdarange, all_interpolated_Qm)
