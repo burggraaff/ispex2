@@ -22,7 +22,8 @@ from matplotlib import pyplot as plt
 
 # Get the data folder from the command line
 file = io.path_from_input(argv)
-save_to = Path("calibration_data")/"wavelength_calibration.npy"
+save_to_Qp = Path("calibration_data")/"wavelength_calibration_Qp.npy"
+save_to_Qm = Path("calibration_data")/"wavelength_calibration_Qm.npy"
 
 # Load the data
 img = io.load_raw_file(file)
@@ -75,9 +76,9 @@ plot.wavelength_coefficients(yp, wavelength_fits_Qp, coefficients_fit_Qp)
 plot.wavelength_coefficients(ym, wavelength_fits_Qm, coefficients_fit_Qm)
 
 # Save the coefficients to file
-wavelength.save_coefficients(coefficients_Qp, saveto=save_to)
-wavelength.save_coefficients(coefficients_Qm, saveto=save_to)
-print(f"Saved wavelength coefficients to '{save_to}'")
+wavelength.save_coefficients(coefficients_Qp, saveto=save_to_Qp)
+wavelength.save_coefficients(coefficients_Qm, saveto=save_to_Qm)
+print(f"Saved wavelength coefficients to '{save_to_Qp}' and '{save_to_Qm}'")
 
 # Convert the input spectrum to wavelengths and plot it, as a sanity check
 wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
