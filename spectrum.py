@@ -1,30 +1,47 @@
 import numpy as np
 from sys import argv
-from spectacle import raw, plot, io, wavelength, calibrate
+from spectacle import plot, io, wavelength, raw2
+from ispex import general as ispex_general
+from matplotlib import pyplot as plt
+from pathlib import Path
 
 file = io.path_from_input(argv)
-root, images, stacks, products, results = io.folders(file)
 
-img  = io.load_raw_file(file)
-exif = io.load_exif(file)
+# Load the data
+img = io.load_raw_file(file)
+print("Loaded data")
 
-values = img.raw_image.astype(np.float32)
-values = calibrate.correct_bias(root, values)
+data = img.raw_image.astype(np.float64)
+bayer_map = img.raw_colors
 
-image_cut  = values        [760:1000, 2150:3900]
-colors_cut = img.raw_colors[760:1000, 2150:3900]
-x = np.arange(2150, 3900)
-y = np.arange(760 , 1000)
+data = img.raw_image.astype(np.float64) - float(img.black_level_per_channel[0])
+#data = calibrate.correct_bias(root, data)
 
-RGBG = raw.demosaick(colors_cut, image_cut)
-plot.show_RGBG(RGBG)
+slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
 
-coefficients = wavelength.load_coefficients(results/"ispex/wavelength_solution.npy")
-wavelengths_cut = wavelength.calculate_wavelengths(coefficients, x, y)
-wavelengths_split = raw.demosaick(colors_cut, wavelengths_cut)
+data_Qp, data_Qm = data[slice_Qp], data[slice_Qm]
+bayer_Qp, bayer_Qm = bayer_map[slice_Qp], bayer_map[slice_Qm]
 
-lambdarange, all_interpolated = wavelength.interpolate_multi(wavelengths_split, RGBG)
-stacked = wavelength.stack(lambdarange, all_interpolated)
-plot.plot_spectrum(stacked[0], stacked[1:], saveto=results/"ispex"/(file.stem+".pdf"))
+x = np.arange(data_Qp.shape[1])
+yp = np.arange(data_Qp.shape[0])
+ym = np.arange(data_Qm.shape[0])
 
-np.save(results/"ispex"/(file.stem+".npy"), stacked)
+coefficients_Qp = np.load(Path("calibration_data")/"wavelength_calibration_Qp.npy")
+coefficients_Qm = np.load(Path("calibration_data")/"wavelength_calibration_Qm.npy")
+
+wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
+wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
+
+wavelengths_split_Qp,_ = raw2.pull_apart(wavelengths_Qp, bayer_Qp)
+wavelengths_split_Qm,_ = raw2.pull_apart(wavelengths_Qm, bayer_Qm)
+RGBG_Qp,_ = raw2.pull_apart(data_Qp, bayer_Qp)
+RGBG_Qm,_ = raw2.pull_apart(data_Qm, bayer_Qm)
+
+lambdarange, all_interpolated_Qp = wavelength.interpolate_multi(wavelengths_split_Qp, RGBG_Qp)
+lambdarange, all_interpolated_Qm = wavelength.interpolate_multi(wavelengths_split_Qm, RGBG_Qm)
+
+stacked_Qp = wavelength.stack(lambdarange, all_interpolated_Qp)
+stacked_Qm = wavelength.stack(lambdarange, all_interpolated_Qm)
+
+plot.plot_spectrum(stacked_Qp[0], stacked_Qp[1:], saveto=Path("results")/f"{file.stem}_Qp.pdf")
+plot.plot_spectrum(stacked_Qm[0], stacked_Qm[1:], saveto=Path("results")/f"{file.stem}_Qm.pdf")
