@@ -40,6 +40,20 @@ RGBG_Qm,_ = raw2.pull_apart(data_Qm, bayer_Qm)
 lambdarange, all_interpolated_Qp = wavelength.interpolate_multi(wavelengths_split_Qp, RGBG_Qp)
 lambdarange, all_interpolated_Qm = wavelength.interpolate_multi(wavelengths_split_Qm, RGBG_Qm)
 
+for j, c in enumerate("rgb"):
+    plt.plot(lambdarange, all_interpolated_Qp[j,:,50], c=c)
+plt.xlabel("Wavelength [nm]")
+plt.ylabel("Counts [ADU]")
+plt.savefig(Path("results")/f"{file.stem}_row_Qp.pdf", bbox_inches="tight")
+plt.close()
+
+for j, c in enumerate("rgb"):
+    plt.plot(lambdarange, all_interpolated_Qm[j,:,50], c=c)
+plt.xlabel("Wavelength [nm]")
+plt.ylabel("Counts [ADU]")
+plt.savefig(Path("results")/f"{file.stem}_row_Qm.pdf", bbox_inches="tight")
+plt.close()
+
 stacked_Qp = wavelength.stack(lambdarange, all_interpolated_Qp)
 stacked_Qm = wavelength.stack(lambdarange, all_interpolated_Qm)
 
