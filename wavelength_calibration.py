@@ -43,9 +43,9 @@ bayer_Qp, bayer_Qm = bayer_map[slice_Qp], bayer_map[slice_Qm]
 RGB_Qp = raw2.pull_apart2(data_Qp, bayer_Qp)
 RGB_Qm = raw2.pull_apart2(data_Qm, bayer_Qm)
 
-x = np.arange(RGB_Qp.shape[2])
-yp = np.arange(RGB_Qp.shape[1])
-ym = np.arange(RGB_Qm.shape[1])
+x = np.arange(data_Qp.shape[1])
+yp = np.arange(data_Qp.shape[0])
+ym = np.arange(data_Qm.shape[0])
 
 # Convolve the data with a Gaussian kernel on the wavelength axis to remove
 # noise and fill in the gaps
