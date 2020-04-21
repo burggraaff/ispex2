@@ -60,9 +60,22 @@ plt.close()
 # Single wavelength
 j = 50
 plt.plot(all_interpolated_Qp[2,j,:])
+plt.show()
+plt.close()
 
 stacked_Qp = wavelength.stack(lambdarange, all_interpolated_Qp)
 stacked_Qm = wavelength.stack(lambdarange, all_interpolated_Qm)
 
 plot.plot_spectrum(stacked_Qp[0], stacked_Qp[1:], saveto=Path("results")/f"{file.stem}_Qp.pdf")
 plot.plot_spectrum(stacked_Qm[0], stacked_Qm[1:], saveto=Path("results")/f"{file.stem}_Qm.pdf")
+
+spectral_response = np.load("calibration_data/spectral_response.npy")
+spectral_response_RGB = np.stack([np.interp(lambdarange, spectral_response[0], spectral_response[j]) for j in [1,2,3]])
+
+spectral_response_RGB[spectral_response_RGB < 0.2] = np.nan
+
+stacked_Qp[1:] = stacked_Qp[1:] / spectral_response_RGB
+stacked_Qm[1:] = stacked_Qm[1:] / spectral_response_RGB
+
+plot.plot_spectrum(stacked_Qp[0], stacked_Qp[1:], saveto=Path("results")/f"{file.stem}_norm_Qp.pdf")
+plot.plot_spectrum(stacked_Qm[0], stacked_Qm[1:], saveto=Path("results")/f"{file.stem}_norm_Qm.pdf")
