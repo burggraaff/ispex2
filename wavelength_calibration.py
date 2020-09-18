@@ -16,7 +16,7 @@ will be fixed with the general overhaul for iSPEX 2.
 import numpy as np
 from sys import argv
 from spectacle import general, io, plot, wavelength, raw2
-from ispex import general as ispex_general, wavelength as wvl
+from ispex import general as ispex_general, wavelength as wvl, plot as ispex_plot
 from pathlib import Path
 from matplotlib import pyplot as plt
 
@@ -49,8 +49,9 @@ ym = np.arange(data_Qm.shape[0])
 
 # Convolve the data with a Gaussian kernel on the wavelength axis to remove
 # noise and fill in the gaps
-gauss_Qp = general.gauss_nan(RGB_Qp, sigma=(0,0,10))
-gauss_Qm = general.gauss_nan(RGB_Qm, sigma=(0,0,10))
+# 1 pixel in RGBG space = 2 pixels in RGB space
+gauss_Qp = general.gauss_nan(RGB_Qp, sigma=(0,0,6))
+gauss_Qm = general.gauss_nan(RGB_Qm, sigma=(0,0,6))
 
 # Find the locations of the line peaks in every row
 x_offset = 1700
@@ -60,8 +61,20 @@ lines_Qm = wavelength.find_fluorescent_lines(gauss_Qm[...,x_offset:]) + x_offset
 lines_fit_Qp = wavelength.fit_fluorescent_lines(lines_Qp, yp)
 lines_fit_Qm = wavelength.fit_fluorescent_lines(lines_Qm, ym)
 
-plot.plot_fluorescent_lines(yp, lines_Qp, lines_fit_Qp)
-plot.plot_fluorescent_lines(ym, lines_Qm, lines_fit_Qm)
+ispex_plot.plot_fluorescent_lines(yp, lines_Qp, lines_fit_Qp)
+ispex_plot.plot_fluorescent_lines(ym, lines_Qm, lines_fit_Qm)
+
+ispex_plot.plot_fluorescent_lines_double([yp, ym], [lines_Qp, lines_Qm], [lines_fit_Qp, lines_fit_Qm], saveto="TL_calibration.pdf")
+
+# Calculate the dispersion
+dispersion_Qp = wvl.dispersion_fluorescent(lines_fit_Qp)
+dispersion_Qm = wvl.dispersion_fluorescent(lines_fit_Qm)
+
+ispex_plot.plot_fluorescent_lines_dispersion([yp, ym], [lines_Qp, lines_Qm], [lines_fit_Qp, lines_fit_Qm], [dispersion_Qp, dispersion_Qm], saveto="TL_calibration_dispersion.pdf")
+
+# Calculate the spectral resolution
+resolution_Qp = wvl.resolution(gauss_Qp, dispersion_Qp)
+resolution_Qm = wvl.resolution(gauss_Qm, dispersion_Qm)
 
 # Fit a wavelength relation for each row
 wavelength_fits_Qp = wavelength.fit_many_wavelength_relations(yp, lines_fit_Qp)
@@ -72,8 +85,8 @@ coefficients_Qp, coefficients_fit_Qp = wavelength.fit_wavelength_coefficients(yp
 coefficients_Qm, coefficients_fit_Qm = wavelength.fit_wavelength_coefficients(ym, wavelength_fits_Qm)
 
 # Plot the polynomial fits to the coefficients
-plot.wavelength_coefficients(yp, wavelength_fits_Qp, coefficients_fit_Qp)
-plot.wavelength_coefficients(ym, wavelength_fits_Qm, coefficients_fit_Qm)
+#plot.wavelength_coefficients(yp, wavelength_fits_Qp, coefficients_fit_Qp)
+#plot.wavelength_coefficients(ym, wavelength_fits_Qm, coefficients_fit_Qm)
 
 # Save the coefficients to file
 wavelength.save_coefficients(coefficients_Qp, saveto=save_to_Qp)
