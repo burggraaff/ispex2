@@ -1,32 +1,28 @@
 import numpy as np
 from sys import argv
-from spectacle import plot, io, wavelength, raw2, general, calibrate
+from spectacle import plot, io, wavelength, raw, general, calibrate
 from ispex import general as ispex_general, plot as ispex_plot
 from matplotlib import pyplot as plt
 from pathlib import Path
 
 file = io.path_from_input(argv)
 
+# Hard-coded calibration for now
 root = Path(r"C:\Users\Burggraaff\SPECTACLE_data\iPhone_SE")
 
+# Load Camera object
+camera = io.load_camera(root)
+print(f"Loaded Camera object: {camera}")
+
 # Load the data
-img = io.load_raw_file(file)
+data = io.load_raw_image(file)
 print("Loaded data")
 
-data = img.raw_image.astype(np.float64)
-bayer_map = img.raw_colors
-
 # Bias correction
-try:
-    data = calibrate.correct_bias(root, data)
-except:
-    data = img.raw_image.astype(np.float64) - float(img.black_level_per_channel[0])
+data = camera.correct_bias(data)
 
 # Flat-field correction
-try:
-    data = calibrate.correct_flatfield(root, data)
-except:
-    print("No flat-field correction done")
+data = camera.correct_flatfield(data)
 
 slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
 
@@ -45,12 +41,8 @@ coefficients_Qm = np.load(Path("calibration_data")/"wavelength_calibration_Qm.np
 wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
 wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 
-wavelengths_split_Qp,_ = raw2.pull_apart2(wavelengths_Qp, bayer_Qp)
-wavelengths_split_Qm,_ = raw2.pull_apart2(wavelengths_Qm, bayer_Qm)
-RGBG_Qp,_ = raw2.pull_apart2(data_Qp, bayer_Qp)
-RGBG_Qm,_ = raw2.pull_apart2(data_Qm, bayer_Qm)
-xp_split,_ = raw2.pull_apart2(xp, bayer_Qp)
-xm_split,_ = raw2.pull_apart2(xm, bayer_Qm)
+wavelengths_split_Qp, RGBG_Qp, xp_split = raw.demosaick(bayer_Qp, wavelengths_Qp, data_Qp, xp)
+wavelengths_split_Qm, RGBG_Qm, xm_split = raw.demosaick(bayer_Qm, wavelengths_Qm, data_Qm, xm)
 
 plt.figure(figsize=(6,2))
 for j, c in enumerate("rgb"):
