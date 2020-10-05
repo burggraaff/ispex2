@@ -27,7 +27,7 @@ data = camera.correct_flatfield(data)
 slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
 
 data_Qp, data_Qm = data[slice_Qp], data[slice_Qm]
-bayer_Qp, bayer_Qm = bayer_map[slice_Qp], bayer_map[slice_Qm]
+bayer_Qp, bayer_Qm = camera.bayer_map[slice_Qp], camera.bayer_map[slice_Qm]
 
 x = np.arange(data_Qp.shape[1])
 xp = np.repeat(x[:,np.newaxis], bayer_Qp.shape[0], axis=1).T
