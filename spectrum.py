@@ -45,12 +45,12 @@ coefficients_Qm = np.load(Path("calibration_data")/"wavelength_calibration_Qm.np
 wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
 wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 
-wavelengths_split_Qp,_ = raw2.pull_apart(wavelengths_Qp, bayer_Qp)
-wavelengths_split_Qm,_ = raw2.pull_apart(wavelengths_Qm, bayer_Qm)
-RGBG_Qp,_ = raw2.pull_apart(data_Qp, bayer_Qp)
-RGBG_Qm,_ = raw2.pull_apart(data_Qm, bayer_Qm)
-xp_split,_ = raw2.pull_apart(xp, bayer_Qp)
-xm_split,_ = raw2.pull_apart(xm, bayer_Qm)
+wavelengths_split_Qp,_ = raw2.pull_apart2(wavelengths_Qp, bayer_Qp)
+wavelengths_split_Qm,_ = raw2.pull_apart2(wavelengths_Qm, bayer_Qm)
+RGBG_Qp,_ = raw2.pull_apart2(data_Qp, bayer_Qp)
+RGBG_Qm,_ = raw2.pull_apart2(data_Qm, bayer_Qm)
+xp_split,_ = raw2.pull_apart2(xp, bayer_Qp)
+xm_split,_ = raw2.pull_apart2(xm, bayer_Qm)
 
 plt.figure(figsize=(6,2))
 for j, c in enumerate("rgb"):
