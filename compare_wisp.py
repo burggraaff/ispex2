@@ -85,3 +85,31 @@ axs[-1].set_xlim(0, x.shape[0])
 axs[0].set_title(f"Pixel row {row}")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_row_gauss_Qm.pdf", bbox_inches="tight")
 plt.close()
+
+# Convert from pixels to nm
+# To do: use apply_multi for interpolate_multi
+lambdarange, mean_grey_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_grey_Qp_RGBG)
+lambdarange, mean_sky_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_sky_Qp_RGBG)
+lambdarange, mean_water_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_water_Qp_RGBG)
+
+lambdarange, mean_grey_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_grey_Qm_RGBG)
+lambdarange, mean_sky_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_sky_Qm_RGBG)
+lambdarange, mean_water_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_water_Qm_RGBG)
+
+# Plot the Qm data in a single row, in nm
+row = 50
+fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
+for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm], ["Grey card", "Sky", "Water"]):
+    for j, c in enumerate("rgb"):
+        ax.plot(lambdarange, RGBG_Qm[j,:,row], c=c)
+    ax.set_ylabel(f"{label}\nCounts [ADU]")
+    ax.grid(ls="--")
+    ax.set_ylim(-5, RGBG_Qm[...,row].max()*1.05)
+for ax in axs[:-1]:
+    ax.tick_params(axis="x", bottom=False, labelbottom=False)
+axs[-1].set_xlabel("Wavelength [nm]")
+axs[-1].set_xlim(390, 700)
+axs[0].set_title(f"Pixel row {row}")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_nm.pdf", bbox_inches="tight")
+plt.close()
+
