@@ -6,6 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from spectacle import plot as spectacle_plot
 from .wavelength import fluorescent_lines
+from .general import find_spectrum
 from matplotlib import pyplot as plt, patheffects as pe, ticker
 
 offsets = [650, 1550]
@@ -73,3 +74,20 @@ def plot_fluorescent_lines_dispersion(y2, lines2, lines_fit2, dispersion2, savet
         ax.grid(ls="--")
 
     spectacle_plot._saveshow(saveto, bbox_inches="tight")
+
+
+def plot_bounding_boxes(data, label="", saveto="bounding_boxes.pdf", **kwargs):
+    """
+    Plot the spectrum bounding boxes on top of an image.
+    """
+    # Find slit/spectrum
+    slice_Qp, slice_Qm = find_spectrum(data)
+
+    # Show found slit/spectrum
+    plt.imshow(data, **kwargs)
+    plt.axhspan(slice_Qp.start, slice_Qp.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+    plt.axhspan(slice_Qm.start, slice_Qm.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+    plt.title(f"Bounding boxes\n{label}")
+    plt.savefig(saveto, bbox_inches="tight")
+    plt.show()
+    plt.close()

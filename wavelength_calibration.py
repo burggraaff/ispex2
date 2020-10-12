@@ -43,13 +43,7 @@ data = data - float(img.black_level_per_channel[0])
 slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
 
 # Show found slit / spectrum
-plt.imshow(img_post)
-plt.axhspan(slice_Qp.start, slice_Qp.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
-plt.axhspan(slice_Qm.start, slice_Qm.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
-plt.title(f"Bounding boxes\n{file}")
-plt.savefig("bounding_boxes.pdf", bbox_inches="tight")
-plt.show()
-plt.close()
+ispex_plot.plot_bounding_boxes(img_post, label=file, saveto="bounding_boxes.pdf")
 
 data_Qp, data_Qm = data[slice_Qp], data[slice_Qm]
 bayer_Qp, bayer_Qm = bayer_map[slice_Qp], bayer_map[slice_Qm]

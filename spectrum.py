@@ -24,7 +24,11 @@ data = camera.correct_bias(data)
 # Flat-field correction
 data = camera.correct_flatfield(data)
 
+# Slice the data
 slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
+
+# Show the bounding boxes for visualisation
+ispex_plot.plot_bounding_boxes(data, label=file, saveto=Path("results")/f"{file.stem}_bounding_boxes.pdf")
 
 data_Qp, data_Qm = data[slice_Qp], data[slice_Qm]
 bayer_Qp, bayer_Qm = camera.bayer_map[slice_Qp], camera.bayer_map[slice_Qm]
