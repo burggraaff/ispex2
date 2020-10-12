@@ -29,10 +29,12 @@ save_to_Qm = Path("calibration_data")/"wavelength_calibration_Qm.npy"
 img = io.load_raw_file(file)
 print("Loaded data")
 
-img_post = img.postprocess()  # Post-processed image for visualisation
-img_post = np.swapaxes(img_post, 0, 1)
 data = img.raw_image.astype(np.float64)
 bayer_map = img.raw_colors
+
+# Post-processed image for visualisation
+img_post = img.postprocess()
+img_post = np.swapaxes(img_post, 0, 1)
 
 # Bias calibration without SPECTACLE data
 data = data - float(img.black_level_per_channel[0])
