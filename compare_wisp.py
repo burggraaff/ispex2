@@ -193,3 +193,16 @@ axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Stacked $I$ spectrum")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_I.pdf", bbox_inches="tight")
 plt.close()
+
+# Calculate R_Rs naively
+Ed = np.pi / 0.18 * mean_grey_I
+Lw = mean_water_I - 0.028 * mean_sky_I
+Rrs = Lw / Ed
+for j, c in enumerate("rgb"):
+    plt.plot(lambdarange, Rrs[j], c=c)
+plt.ylabel("$R_{rs}$ [sr${-1}$]")
+plt.grid(ls="--")
+plt.xlabel("Wavelength [nm]")
+plt.title(f"Remote sensing reflectance")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs.pdf", bbox_inches="tight")
+plt.close()
