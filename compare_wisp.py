@@ -173,3 +173,23 @@ axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Stacked $+Q$ spectrum")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_Qp.pdf", bbox_inches="tight")
 plt.close()
+
+# Get the I spectrum
+# Assume 100% transmission for now
+mean_grey_I, mean_sky_I, mean_water_I = mean_grey_Qp + mean_grey_Qm, mean_sky_Qp + mean_sky_Qm, mean_water_Qp + mean_water_Qm
+
+# Plot the stacked I spectra
+fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
+for ax, RGBG, label in zip(axs, [mean_grey_I, mean_sky_I, mean_water_I], ["Grey card", "Sky", "Water"]):
+    for j, c in enumerate("rgb"):
+        ax.plot(lambdarange, RGBG[j], c=c)
+    ax.set_ylabel(f"{label}\nCounts [rel. ADU]")
+    ax.grid(ls="--")
+    ax.set_ylim(-5, np.nanmax(RGBG)*1.05)
+for ax in axs[:-1]:
+    ax.tick_params(axis="x", bottom=False, labelbottom=False)
+axs[-1].set_xlabel("Wavelength [nm]")
+axs[-1].set_xlim(390, 700)
+axs[0].set_title(f"Stacked $I$ spectrum")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_I.pdf", bbox_inches="tight")
+plt.close()
