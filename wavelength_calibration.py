@@ -29,13 +29,25 @@ save_to_Qm = Path("calibration_data")/"wavelength_calibration_Qm.npy"
 img = io.load_raw_file(file)
 print("Loaded data")
 
+img_post = img.postprocess()  # Post-processed image for visualisation
+img_post = np.swapaxes(img_post, 0, 1)
 data = img.raw_image.astype(np.float64)
 bayer_map = img.raw_colors
 
-# Rudimentary bias calibration
+# Bias calibration without SPECTACLE data
 data = data - float(img.black_level_per_channel[0])
 
+# Find slit
 slice_Qp, slice_Qm = ispex_general.find_spectrum(data)
+
+# Show found slit / spectrum
+plt.imshow(img_post)
+plt.axhspan(slice_Qp.start, slice_Qp.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+plt.axhspan(slice_Qm.start, slice_Qm.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+plt.title(f"Bounding boxes\n{file}")
+plt.savefig("bounding_boxes.pdf", bbox_inches="tight")
+plt.show()
+plt.close()
 
 data_Qp, data_Qm = data[slice_Qp], data[slice_Qm]
 bayer_Qp, bayer_Qm = bayer_map[slice_Qp], bayer_map[slice_Qm]
