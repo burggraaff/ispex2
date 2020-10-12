@@ -11,7 +11,7 @@ def find_spectrum(data, device="iPhone SE"):
     Hardcoded for now
     """
 
-    slice_Qp = np.s_[650:1400]
-    slice_Qm = np.s_[1550:2300]
+    slice_Qp = np.s_[1000:1300]
+    slice_Qm = np.s_[1750:2050]
 
     return slice_Qp, slice_Qm
