@@ -5,7 +5,7 @@ Compare stacked images to WISP data.
 import numpy as np
 from sys import argv
 from spectacle import plot, io, wavelength, raw, general, calibrate
-from ispex import general as ispex_general, plot as ispex_plot
+from ispex import general as ispex_general, plot as ispex_plot, validation
 from matplotlib import pyplot as plt
 from pathlib import Path
 
@@ -201,8 +201,13 @@ Rrs = Lw / Ed
 for j, c in enumerate("rgb"):
     plt.plot(lambdarange, Rrs[j], c=c)
 plt.ylabel("$R_{rs}$ [sr${-1}$]")
+plt.ylim(ymin=0)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs.pdf", bbox_inches="tight")
 plt.close()
+
+# Load WISP-3 data
+wisp_filename = "data/20200921_LHBP1/WISP/20200921_135529_wisp_spec.txt"
+wisp_wavelengths, wisp_ed, wisp_lsky, wisp_lu, wisp_rrs = validation.load_wisp_data(wisp_filename)
