@@ -209,5 +209,18 @@ plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs.pdf", bbox_inches="tight
 plt.close()
 
 # Load WISP-3 data
-wisp_filename = "data/20200921_LHBP1/WISP/20200921_135529_wisp_spec.txt"
-wisp_wavelengths, wisp_ed, wisp_lsky, wisp_lu, wisp_rrs = validation.load_wisp_data(wisp_filename)
+wisp_wavelengths, wisp_lu, wisp_lu_err, wisp_ls, wisp_ls_err, wisp_ed, wisp_ed_err, wisp_rrs, wisp_rrs_err = validation.load_wisp_data(filename_wisp)
+
+# Compare Rrs plots
+for j, c in enumerate("rgb"):
+    plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}")
+plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3")
+plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
+plt.ylabel("$R_{rs}$ [sr${-1}$]")
+plt.ylim(ymin=0)
+plt.grid(ls="--")
+plt.xlabel("Wavelength [nm]")
+plt.title(f"Remote sensing reflectance")
+plt.legend(loc="best")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs_WISP.pdf", bbox_inches="tight")
+plt.close()
