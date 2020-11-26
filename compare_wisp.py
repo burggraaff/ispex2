@@ -200,7 +200,7 @@ Lw = mean_water_I - 0.028 * mean_sky_I
 Rrs = Lw / Ed
 for j, c in enumerate("rgb"):
     plt.plot(lambdarange, Rrs[j], c=c)
-plt.ylabel("$R_{rs}$ [sr${-1}$]")
+plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
 plt.ylim(ymin=0)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
@@ -216,7 +216,7 @@ for j, c in enumerate("rgb"):
     plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}")
 plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3")
 plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
-plt.ylabel("$R_{rs}$ [sr${-1}$]")
+plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
 plt.ylim(ymin=0)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
