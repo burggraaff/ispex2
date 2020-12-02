@@ -29,3 +29,24 @@ def find_background(data, device="iPhone SE"):
     bottom = np.s_[2500:]
 
     return top, middle, bottom
+
+
+def background_subtraction_spectrum(lambdarange, data):
+    """
+    Do a simple polynomial-based background subtraction on the spectrum
+    """
+    background = data.copy()
+    background_inds = np.where((lambdarange < 380) | (lambdarange > 710))[0]
+
+    background = np.moveaxis(background, 1, 0)
+    background = background.reshape(len(lambdarange), -1)
+
+    f = np.polyfit(lambdarange[background_inds], background[background_inds], 1)
+    background_fit = f[0] * lambdarange[:,np.newaxis] + f[1]
+
+    background_fit = background_fit.reshape(len(lambdarange), 4, -1)
+    background_fit = np.moveaxis(background_fit, 1, 0)
+
+    data_corrected = data - background_fit
+
+    return data_corrected

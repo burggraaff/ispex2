@@ -50,15 +50,6 @@ ispex_plot.plot_bounding_boxes(mean_grey, label=filename_grey, saveto=Path("resu
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp = mean_grey[slice_Qp], mean_sky[slice_Qp], mean_water[slice_Qp]
 mean_grey_Qm, mean_sky_Qm, mean_water_Qm = mean_grey[slice_Qm], mean_sky[slice_Qm], mean_water[slice_Qm]
 
-# Background substraction
-background_grey = mean_grey[middle].mean(axis=0)
-background_sky = mean_sky[middle].mean(axis=0)
-background_water = mean_water[middle].mean(axis=0)
-
-mean_grey_Qp -= background_grey ; mean_grey_Qm -= background_grey
-mean_sky_Qp -= background_sky ; mean_sky_Qm -= background_sky
-mean_water_Qp -= background_water ; mean_water_Qm -= background_water
-
 bayer_Qp, bayer_Qm = camera.bayer_map[slice_Qp], camera.bayer_map[slice_Qm]
 
 x = np.arange(mean_grey_Qp.shape[1])
@@ -101,13 +92,24 @@ plt.close()
 
 # Convert from pixels to nm
 # To do: use apply_multi for interpolate_multi
-lambdarange, mean_grey_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_grey_Qp_RGBG)
-lambdarange, mean_sky_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_sky_Qp_RGBG)
-lambdarange, mean_water_Qp_nm = wavelength.interpolate_multi(wavelengths_split_Qp, mean_water_Qp_RGBG)
+interpolation = lambda wavelengths_split, RGBG: wavelength.interpolate_multi(wavelengths_split, RGBG, lambdamin=200, lambdamax=800, lambdastep=0.5)
 
-lambdarange, mean_grey_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_grey_Qm_RGBG)
-lambdarange, mean_sky_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_sky_Qm_RGBG)
-lambdarange, mean_water_Qm_nm = wavelength.interpolate_multi(wavelengths_split_Qm, mean_water_Qm_RGBG)
+lambdarange, mean_grey_Qp_nm = interpolation(wavelengths_split_Qp, mean_grey_Qp_RGBG)
+lambdarange, mean_sky_Qp_nm = interpolation(wavelengths_split_Qp, mean_sky_Qp_RGBG)
+lambdarange, mean_water_Qp_nm = interpolation(wavelengths_split_Qp, mean_water_Qp_RGBG)
+
+lambdarange, mean_grey_Qm_nm = interpolation(wavelengths_split_Qm, mean_grey_Qm_RGBG)
+lambdarange, mean_sky_Qm_nm = interpolation(wavelengths_split_Qm, mean_sky_Qm_RGBG)
+lambdarange, mean_water_Qm_nm = interpolation(wavelengths_split_Qm, mean_water_Qm_RGBG)
+
+# Spectrum-based background subtraction
+mean_grey_Qp_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_grey_Qp_nm)
+mean_sky_Qp_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_sky_Qp_nm)
+mean_water_Qp_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_water_Qp_nm)
+
+mean_grey_Qm_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_grey_Qm_nm)
+mean_sky_Qm_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_sky_Qm_nm)
+mean_water_Qm_nm = ispex_general.background_subtraction_spectrum(lambdarange, mean_water_Qm_nm)
 
 # Plot the Qm data in a single row, in nm
 row = 50
