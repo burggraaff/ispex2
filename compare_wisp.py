@@ -132,7 +132,7 @@ plt.close()
 camera._load_spectral_response()
 spectral_response = camera.spectral_response
 spectral_response_RGBG = np.stack([np.interp(lambdarange, spectral_response[0], spectral_response[j]) for j in [1,2,3,2]])
-spectral_response_RGBG[spectral_response_RGBG < 0.20] = np.nan
+spectral_response_RGBG[spectral_response_RGBG < 0.05] = np.nan
 
 mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf = [arr/spectral_response_RGBG[...,np.newaxis] for arr in [mean_grey_Qp_nm, mean_sky_Qp_nm, mean_water_Qp_nm, mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm]]
 
