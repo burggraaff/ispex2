@@ -27,9 +27,9 @@ def load_wisp_data(wisp_filename):
     Lu_mean = Lu.mean(axis=1)
     Ed_mean = Ed.mean(axis=1)
 
-    Ld_err = Ld.std(axis=1) / np.sqrt(Ld.shape[1])
-    Lu_err = Lu.std(axis=1) / np.sqrt(Lu.shape[1])
-    Ed_err = Ed.std(axis=1) / np.sqrt(Ed.shape[1])
+    Ld_err = Ld.std(axis=1)# / np.sqrt(Ld.shape[1])
+    Lu_err = Lu.std(axis=1)# / np.sqrt(Lu.shape[1])
+    Ed_err = Ed.std(axis=1)# / np.sqrt(Ed.shape[1])
 
     rho = 0.028
     Rrs = (Lu_mean - rho*Ld_mean) / Ed_mean
