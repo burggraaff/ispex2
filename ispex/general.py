@@ -15,3 +15,17 @@ def find_spectrum(data, device="iPhone SE"):
     slice_Qm = np.s_[1750:2050]
 
     return slice_Qp, slice_Qm
+
+
+def find_background(data, device="iPhone SE"):
+    """
+    Find the x and y limits for background light
+
+    Hardcoded for now
+    """
+
+    top = np.s_[:600]
+    middle = np.s_[1470:1600]
+    bottom = np.s_[2500:]
+
+    return top, middle, bottom

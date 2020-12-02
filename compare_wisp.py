@@ -42,12 +42,22 @@ mean_grey, mean_sky, mean_water = camera.correct_flatfield(mean_grey, mean_sky, 
 
 # Slice the data
 slice_Qp, slice_Qm = ispex_general.find_spectrum(mean_grey)
+top, middle, bottom = ispex_general.find_background(mean_grey)
 
 # Show the bounding boxes for visualisation
 ispex_plot.plot_bounding_boxes(mean_grey, label=filename_grey, saveto=Path("results")/f"{filename_grey.stem}_bounding_boxes.pdf", vmax=1000)
 
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp = mean_grey[slice_Qp], mean_sky[slice_Qp], mean_water[slice_Qp]
 mean_grey_Qm, mean_sky_Qm, mean_water_Qm = mean_grey[slice_Qm], mean_sky[slice_Qm], mean_water[slice_Qm]
+
+# Background substraction
+background_grey = mean_grey[middle].mean(axis=0)
+background_sky = mean_sky[middle].mean(axis=0)
+background_water = mean_water[middle].mean(axis=0)
+
+mean_grey_Qp -= background_grey ; mean_grey_Qm -= background_grey
+mean_sky_Qp -= background_sky ; mean_sky_Qm -= background_sky
+mean_water_Qp -= background_water ; mean_water_Qm -= background_water
 
 bayer_Qp, bayer_Qm = camera.bayer_map[slice_Qp], camera.bayer_map[slice_Qm]
 
