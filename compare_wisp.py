@@ -152,38 +152,27 @@ axs[0].set_title(f"Pixel row {row}")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_SRF.pdf", bbox_inches="tight")
 plt.close()
 
-mean_grey_Qp, mean_sky_Qp, mean_water_Qp, mean_grey_Qm, mean_sky_Qm, mean_water_Qm = [arr.sum(axis=2) for arr in [mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf]]
+mean_grey_Qp, mean_sky_Qp, mean_water_Qp, mean_grey_Qm, mean_sky_Qm, mean_water_Qm = [arr.mean(axis=2) for arr in [mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf]]
 
 # Plot the stacked Qm data
-fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
-for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm, mean_sky_Qm, mean_water_Qm], ["Grey card", "Sky", "Water"]):
+fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6,6), sharex=True, sharey="row")
+for ax_row, RGBG_Qp, RGBG_Qm, label in zip(axs, [mean_grey_Qp, mean_sky_Qp, mean_water_Qp], [mean_grey_Qm, mean_sky_Qm, mean_water_Qm], ["Grey card", "Sky", "Water"]):
     for j, c in enumerate("rgb"):
-        ax.plot(lambdarange, RGBG_Qm[j], c=c)
-    ax.set_ylabel(f"{label}\nCounts [rel. ADU]")
-    ax.grid(ls="--")
-    ax.set_ylim(-5, np.nanmax(RGBG_Qm)*1.05)
-for ax in axs[:-1]:
+        ax_row[0].plot(lambdarange, RGBG_Qm[j], c=c)
+        ax_row[1].plot(lambdarange, RGBG_Qp[j], c=c)
+        ax_row[0].set_ylabel(f"{label}\nCounts [rel. ADU]")
+    for ax in ax_row:
+        ax.grid(ls="--")
+        ymax = 1.05 * np.nanmax([RGBG_Qm, RGBG_Qp])
+        ax.set_ylim(-5, ymax)
+for ax in axs[:-1].ravel():
     ax.tick_params(axis="x", bottom=False, labelbottom=False)
-axs[-1].set_xlabel("Wavelength [nm]")
-axs[-1].set_xlim(390, 700)
-axs[0].set_title(f"Stacked $-Q$ spectrum")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_Qm.pdf", bbox_inches="tight")
-plt.close()
-
-# Plot the stacked Qp data
-fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
-for ax, RGBG_Qp, label in zip(axs, [mean_grey_Qp, mean_sky_Qp, mean_water_Qp], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax.plot(lambdarange, RGBG_Qp[j], c=c)
-    ax.set_ylabel(f"{label}\nCounts [rel. ADU]")
-    ax.grid(ls="--")
-    ax.set_ylim(-5, np.nanmax(RGBG_Qp)*1.05)
-for ax in axs[:-1]:
-    ax.tick_params(axis="x", bottom=False, labelbottom=False)
-axs[-1].set_xlabel("Wavelength [nm]")
-axs[-1].set_xlim(390, 700)
-axs[0].set_title(f"Stacked $+Q$ spectrum")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_Qp.pdf", bbox_inches="tight")
+for ax in axs[-1]:
+    ax.set_xlabel("Wavelength [nm]")
+    ax.set_xlim(390, 700)
+axs[0,0].set_title("Stacked $-Q$ spectrum")
+axs[0,1].set_title("Stacked $+Q$ spectrum")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_stack.pdf", bbox_inches="tight")
 plt.close()
 
 # Get the I spectrum
