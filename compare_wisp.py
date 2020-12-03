@@ -154,7 +154,7 @@ plt.close()
 
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp, mean_grey_Qm, mean_sky_Qm, mean_water_Qm = [arr.mean(axis=2) for arr in [mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf]]
 
-# Plot the stacked Qm data
+# Plot the stacked Q+- data
 fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6,6), sharex=True, sharey="row")
 for ax_row, RGBG_Qp, RGBG_Qm, label in zip(axs, [mean_grey_Qp, mean_sky_Qp, mean_water_Qp], [mean_grey_Qm, mean_sky_Qm, mean_water_Qm], ["Grey card", "Sky", "Water"]):
     for j, c in enumerate("rgb"):
