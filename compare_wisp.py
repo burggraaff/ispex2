@@ -196,7 +196,7 @@ plt.savefig(Path("results")/f"{filename_ispex.stem}_stack_I.pdf", bbox_inches="t
 plt.close()
 
 # Calculate R_Rs naively
-Ed = np.pi / 0.18 * mean_grey_I
+Ed = np.pi / 0.23 * mean_grey_I
 Lw = mean_water_I - 0.028 * mean_sky_I
 Rrs = Lw / Ed
 for j, c in enumerate("rgb"):
