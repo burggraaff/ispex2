@@ -213,9 +213,9 @@ plt.close()
 wisp_wavelengths, wisp_lu, wisp_lu_err, wisp_ls, wisp_ls_err, wisp_ed, wisp_ed_err, wisp_rrs, wisp_rrs_err = validation.load_wisp_data(filename_wisp)
 
 # Compare Rrs plots
+plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3", lw=2)
 for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}")
-plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3")
+    plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}", lw=2)
 plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
 plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
 plt.ylim(ymin=0)
