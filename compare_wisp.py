@@ -153,7 +153,6 @@ axs[-1].set_xlabel("Wavelength [nm]")
 axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Pixel row {row}")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_vs_SRF.pdf", bbox_inches="tight")
-plt.show()
 plt.close()
 
 # Plot the Qm data in a single row, SRF-calibrated
