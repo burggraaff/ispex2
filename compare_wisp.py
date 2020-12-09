@@ -128,15 +128,10 @@ axs[0].set_title(f"Pixel row {row}")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_nm.pdf", bbox_inches="tight")
 plt.close()
 
-# SRF calibration - manually for now (need np.newaxis for SPECTACLE function)
+# Import SRF
 camera._load_spectral_response()
 spectral_response = camera.spectral_response
 spectral_response_RGBG = np.stack([np.interp(lambdarange, spectral_response[0], spectral_response[j]) for j in [1,2,3,2]])
-
-spectral_response_RGBG_clipped = spectral_response_RGBG.copy()
-spectral_response_RGBG_clipped[spectral_response_RGBG_clipped < 0.1] = np.nan
-
-mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf = [arr/spectral_response_RGBG_clipped[...,np.newaxis] for arr in [mean_grey_Qp_nm, mean_sky_Qp_nm, mean_water_Qp_nm, mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm]]
 
 # Plot Qm data in nm and the SRF
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
@@ -154,6 +149,34 @@ axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Pixel row {row}")
 plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_vs_SRF.pdf", bbox_inches="tight")
 plt.close()
+
+# SRF calibration
+spectral_response_RGBG_clipped = spectral_response_RGBG.copy()
+spectral_response_RGBG_clipped[spectral_response_RGBG_clipped < 0.1] = np.nan
+
+# Wavelength-shifted SRF calibration
+SRF = spectral_response_RGBG_clipped[...,np.newaxis]
+SRF = np.roll(SRF, -7, axis=1)
+mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf = [arr/SRF for arr in [mean_grey_Qp_nm, mean_sky_Qp_nm, mean_water_Qp_nm, mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm]]
+
+# Plot the Qm data in a single row, SRF-calibrated, with wavelength shift
+fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
+for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf], ["Grey card", "Sky", "Water"]):
+    for j, c in enumerate("rgb"):
+        ax.plot(lambdarange, RGBG_Qm[j,:,row], c=c)
+    ax.set_ylabel(f"{label}\nCounts [rel. ADU]")
+    ax.grid(ls="--")
+    ax.set_ylim(-5, np.nanmax(RGBG_Qm[...,row])*1.05)
+for ax in axs[:-1]:
+    ax.tick_params(axis="x", bottom=False, labelbottom=False)
+axs[-1].set_xlabel("Wavelength [nm]")
+axs[-1].set_xlim(390, 700)
+axs[0].set_title(f"Pixel row {row}")
+plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_SRF_lambda.pdf", bbox_inches="tight")
+plt.close()
+
+# Regular SRF calibration
+mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf = [arr/spectral_response_RGBG_clipped[...,np.newaxis] for arr in [mean_grey_Qp_nm, mean_sky_Qp_nm, mean_water_Qp_nm, mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm]]
 
 # Plot the Qm data in a single row, SRF-calibrated
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
