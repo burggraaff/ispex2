@@ -76,18 +76,23 @@ def plot_fluorescent_lines_dispersion(y2, lines2, lines_fit2, dispersion2, savet
     spectacle_plot._saveshow(saveto, bbox_inches="tight")
 
 
-def plot_bounding_boxes(data, label="", saveto="bounding_boxes.pdf", **kwargs):
+def plot_bounding_boxes(data_grey, data_sky, data_water, label_file="", saveto="bounding_boxes.pdf", **kwargs):
     """
     Plot the spectrum bounding boxes on top of an image.
     """
-    # Find slit/spectrum
-    slice_Qp, slice_Qm = find_spectrum(data)
 
-    # Show found slit/spectrum
-    plt.imshow(data, **kwargs)
-    plt.axhspan(slice_Qp.start, slice_Qp.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
-    plt.axhspan(slice_Qm.start, slice_Qm.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
-    plt.title(f"Bounding boxes\n{label}")
+    fig, axs = plt.subplots(ncols=3, sharex=True, sharey=True, figsize=(10,4))
+
+    for ax, data, label in zip(axs, [data_grey, data_sky, data_water], ["Grey card", "Sky", "Water"]):
+        # Find slit/spectrum
+        slice_Qp, slice_Qm = find_spectrum(data)
+
+        # Show found slit/spectrum
+        ax.imshow(data, **kwargs)
+        ax.axhspan(slice_Qp.start, slice_Qp.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+        ax.axhspan(slice_Qm.start, slice_Qm.stop, facecolor="white", edgecolor="white", alpha=0.1, ls="--")
+        ax.set_title(label)
+
+    fig.suptitle(f"Spectral bounding boxes\n{label_file}")
     plt.savefig(saveto, bbox_inches="tight")
-    plt.show()
     plt.close()
