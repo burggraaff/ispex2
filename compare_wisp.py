@@ -45,7 +45,7 @@ slice_Qp, slice_Qm = ispex_general.find_spectrum(mean_grey)
 top, middle, bottom = ispex_general.find_background(mean_grey)
 
 # Show the bounding boxes for visualisation
-ispex_plot.plot_bounding_boxes(mean_grey, mean_sky, mean_water, label_file=filename_grey, saveto=Path("results")/f"{filename_grey.stem}_bounding_boxes.pdf", vmax=1000)
+ispex_plot.plot_bounding_boxes_Rrs(mean_grey, mean_sky, mean_water, label_file=filename_grey, saveto=Path("results")/f"{filename_grey.stem}_bounding_boxes.pdf", vmax=1000)
 
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp = mean_grey[slice_Qp], mean_sky[slice_Qp], mean_water[slice_Qp]
 mean_grey_Qm, mean_sky_Qm, mean_water_Qm = mean_grey[slice_Qm], mean_sky[slice_Qm], mean_water[slice_Qm]
