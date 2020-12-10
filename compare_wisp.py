@@ -174,7 +174,7 @@ for k, shift in enumerate(np.arange(-50, 50, 1)):
         ax.tick_params(axis="x", bottom=False, labelbottom=False)
     axs[-1].set_xlabel("Wavelength [nm]")
     axs[-1].set_xlim(390, 700)
-    axs[0].set_title(f"Shift: {shift_lambda:.1f} $\\lambda$")
+    axs[0].set_title(f"Shift: {shift_lambda:.1f} nm")
     plt.savefig(Path("results")/f"lambdashift/{filename_ispex.stem}_row_Qm_SRF_lambda_{k:04}.png", bbox_inches="tight")
     plt.close()
 
