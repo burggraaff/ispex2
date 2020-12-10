@@ -14,6 +14,7 @@ filename_ispex, filename_wisp = io.path_from_input(argv)
 
 # For iSPEX, get the grey card, sky, and water filenames
 # For now, assume the given filename was for the grey card
+label_dataset = filename_ispex.parents[1].stem
 parent_ispex = filename_ispex.parent
 filename_grey = filename_ispex
 filename_sky = parent_ispex / (filename_grey.stem.replace("grey", "sky") + filename_grey.suffix)
@@ -45,7 +46,7 @@ slice_Qp, slice_Qm = ispex_general.find_spectrum(mean_grey)
 top, middle, bottom = ispex_general.find_background(mean_grey)
 
 # Show the bounding boxes for visualisation
-ispex_plot.plot_bounding_boxes_Rrs(mean_grey, mean_sky, mean_water, label_file=filename_grey, saveto=Path("results")/f"{filename_grey.stem}_bounding_boxes.pdf", vmax=1000)
+ispex_plot.plot_bounding_boxes_Rrs(mean_grey, mean_sky, mean_water, label_file=filename_grey, saveto=Path("results")/f"{label_dataset}_bounding_boxes.pdf", vmax=1000)
 
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp = mean_grey[slice_Qp], mean_sky[slice_Qp], mean_water[slice_Qp]
 mean_grey_Qm, mean_sky_Qm, mean_water_Qm = mean_grey[slice_Qm], mean_sky[slice_Qm], mean_water[slice_Qm]
@@ -87,7 +88,7 @@ for ax in axs[:-1]:
 axs[-1].set_xlabel("Pixel")
 axs[-1].set_xlim(0, x.shape[0])
 axs[0].set_title(f"Pixel row {row}")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_row_gauss_Qm.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_row_gauss_Qm.pdf", bbox_inches="tight")
 plt.close()
 
 # Convert from pixels to nm
@@ -126,7 +127,7 @@ for ax in axs[:-1]:
 axs[-1].set_xlabel("Wavelength [nm]")
 axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Pixel row {row}")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_nm.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_row_Qm_nm.pdf", bbox_inches="tight")
 plt.close()
 
 # Import SRF
@@ -148,7 +149,7 @@ for ax in axs[:-1]:
 axs[-1].set_xlabel("Wavelength [nm]")
 axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Pixel row {row}")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_vs_SRF.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_row_Qm_vs_SRF.pdf", bbox_inches="tight")
 plt.close()
 
 # SRF calibration
@@ -175,7 +176,7 @@ for k, shift in enumerate(np.arange(-50, 50, 1)):
     axs[-1].set_xlabel("Wavelength [nm]")
     axs[-1].set_xlim(390, 700)
     axs[0].set_title(f"Shift: {shift_lambda:.1f} nm")
-    plt.savefig(Path("results")/f"lambdashift/{filename_ispex.stem}_row_Qm_SRF_lambda_{k:04}.png", bbox_inches="tight")
+    plt.savefig(Path("results")/f"lambdashift/{label_dataset}_row_Qm_SRF_lambda_{k:04}.png", bbox_inches="tight")
     plt.close()
 
 # Regular SRF calibration
@@ -194,7 +195,7 @@ for ax in axs[:-1]:
 axs[-1].set_xlabel("Wavelength [nm]")
 axs[-1].set_xlim(390, 700)
 axs[0].set_title(f"Pixel row {row}")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_row_Qm_SRF.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_row_Qm_SRF.pdf", bbox_inches="tight")
 plt.close()
 
 mean_grey_Qp, mean_sky_Qp, mean_water_Qp, mean_grey_Qm, mean_sky_Qm, mean_water_Qm = [arr.mean(axis=2) for arr in [mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf]]
@@ -223,7 +224,7 @@ for ax in axs[-1]:
 axs[0,0].set_title("Stacked $-Q$ spectrum")
 axs[0,1].set_title("Stacked $+Q$ spectrum")
 axs[0,2].set_title("Stacked $I/2$ spectrum")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_stack.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_stack.pdf", bbox_inches="tight")
 plt.close()
 
 # Calculate R_Rs naively
@@ -237,7 +238,7 @@ plt.ylim(ymin=0)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_Rrs.pdf", bbox_inches="tight")
 plt.close()
 
 # Load WISP-3 data
@@ -254,5 +255,5 @@ plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance")
 plt.legend(loc="best")
-plt.savefig(Path("results")/f"{filename_ispex.stem}_Rrs_WISP.pdf", bbox_inches="tight")
+plt.savefig(Path("results")/f"{label_dataset}_Rrs_WISP.pdf", bbox_inches="tight")
 plt.close()
