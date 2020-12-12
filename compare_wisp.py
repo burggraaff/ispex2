@@ -261,12 +261,16 @@ plt.close()
 # Correlation plot for Rrs
 Rrs_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, R) for R in Rrs])
 max_all = np.nanmax([np.nanmax(Rrs_wisp_lambda), np.nanmax(wisp_rrs)])
+MAD = np.nanmedian(np.abs(Rrs_wisp_lambda - wisp_rrs), axis=1)
+
+plt.figure(figsize=(5,5))
 for j, c in enumerate("rgb"):
     # plt.errorbar(wisp_rrs, Rrs_wisp_lambda[j], xerr=wisp_rrs_err, c=c, fmt="o")
-    plt.scatter(wisp_rrs, Rrs_wisp_lambda[j], c=c)
+    plt.scatter(wisp_rrs, Rrs_wisp_lambda[j], c=c, label=f"{c}: MAD = {MAD[j]:.4f} "+"sr$^{-1}$")
 plt.plot([0, 1], [0, 1], c='k', ls="--")
 plt.xlabel("$R_{rs}$ WISP-3 [sr$^{-1}$]")
 plt.ylabel("$R_{rs}$ iSPEX 2 [sr$^{-1}$]")
+plt.legend(loc="best")
 plt.grid()
 plt.xlim(-1e-3, max_all*1.03)
 plt.ylim(-1e-3, max_all*1.03)
