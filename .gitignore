@@ -2,6 +2,7 @@ calibration_data/*
 data/*
 results/*
 *.pdf
+*.gif
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
