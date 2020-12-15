@@ -227,14 +227,21 @@ axs[0,2].set_title("Stacked $I/2$ spectrum")
 plt.savefig(Path("results")/f"{label_dataset}_stack.pdf", bbox_inches="tight")
 plt.close()
 
+# Mask points where Ed <= 0
+mean_grey_I[mean_grey_I <= 0] = np.nan
+
 # Calculate R_Rs naively
 Ed = np.pi / 0.23 * mean_grey_I
 Lw = mean_water_I - 0.028 * mean_sky_I
 Rrs = Lw / Ed
+
+# Plot Rrs
+ymax = np.nanmax(Rrs) * 1.05
 for j, c in enumerate("rgb"):
     plt.plot(lambdarange, Rrs[j], c=c)
 plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
-plt.ylim(ymin=0)
+plt.xlim(390, 710)
+plt.ylim(0, ymax)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance ({label_dataset})")
@@ -245,12 +252,14 @@ plt.close()
 wisp_wavelengths, wisp_lu, wisp_lu_err, wisp_ls, wisp_ls_err, wisp_ed, wisp_ed_err, wisp_rrs, wisp_rrs_err = validation.load_wisp_data(filename_wisp)
 
 # Compare Rrs plots
+ymax = np.nanmax([ymax, wisp_rrs.max()])
 plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3", lw=2)
 for j, c in enumerate("rgb"):
     plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}", lw=2)
 plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
 plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
-plt.ylim(ymin=0)
+plt.xlim(390, 800)
+plt.ylim(0, ymax)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance ({label_dataset})")
@@ -260,7 +269,6 @@ plt.close()
 
 # Correlation plot for Rrs
 Rrs_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, R) for R in Rrs])
-max_all = np.nanmax([np.nanmax(Rrs_wisp_lambda), np.nanmax(wisp_rrs)])
 MAD = np.nanmedian(np.abs(Rrs_wisp_lambda - wisp_rrs), axis=1)
 MADrel = np.nanmedian(np.abs((Rrs_wisp_lambda - wisp_rrs)/Rrs_wisp_lambda), axis=1) * 100
 
@@ -274,8 +282,8 @@ plt.xlabel("$R_{rs}$ WISP-3 [sr$^{-1}$]")
 plt.ylabel("$R_{rs}$ iSPEX 2 [sr$^{-1}$]")
 plt.legend(loc="best")
 plt.grid(ls="--")
-plt.xlim(-1e-3, max_all*1.03)
-plt.ylim(-1e-3, max_all*1.03)
+plt.xlim(-1e-3, ymax)
+plt.ylim(-1e-3, ymax)
 plt.title(f"WISP-3 vs iSPEX 2 ({label_dataset})")
 plt.savefig(Path("results")/f"{label_dataset}_Rrs_correlation.pdf", bbox_inches="tight")
 plt.close()
