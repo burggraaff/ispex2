@@ -45,8 +45,8 @@ coefficients_Qm = np.load(Path("calibration_data")/"wavelength_calibration_Qm.np
 wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
 wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 
-wavelengths_split_Qp, RGBG_Qp, xp_split = raw.demosaick(bayer_Qp, wavelengths_Qp, data_Qp, xp)
-wavelengths_split_Qm, RGBG_Qm, xm_split = raw.demosaick(bayer_Qm, wavelengths_Qm, data_Qm, xm)
+wavelengths_split_Qp, RGBG_Qp, xp_split = raw.demosaick(bayer_Qp, [wavelengths_Qp, data_Qp, xp])
+wavelengths_split_Qm, RGBG_Qm, xm_split = raw.demosaick(bayer_Qm, [wavelengths_Qm, data_Qm, xm])
 
 plt.figure(figsize=(6,2))
 for j, c in enumerate("rgb"):
@@ -60,8 +60,8 @@ plt.savefig(Path("results")/f"{file.stem}_row_raw_Qm.pdf", bbox_inches="tight")
 plt.close()
 
 # 1 pixel in RGBG space = 2 pixels in RGB space
-RGBG_Qp = general.gauss_nan(RGBG_Qp, sigma=(0,0,3))
-RGBG_Qm = general.gauss_nan(RGBG_Qm, sigma=(0,0,3))
+RGBG_Qp = general.gauss_filter_multidimensional(RGBG_Qp, sigma=(0,0,3))
+RGBG_Qm = general.gauss_filter_multidimensional(RGBG_Qm, sigma=(0,0,3))
 
 plt.figure(figsize=(6,2))
 for j, c in enumerate("rgb"):
