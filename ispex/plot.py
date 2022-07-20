@@ -30,7 +30,7 @@ def plot_fluorescent_lines(y, lines, lines_fit, saveto=None):
         plt.plot(lines_fit[j], y, color=c, path_effects=p_eff)
 
     plt.title("Locations of RGB maxima")
-    plt.xlabel("Line center") # x
+    plt.xlabel("Line centre") # x
     plt.ylabel("Row along spectrum") # y
     plt.axis("tight")
     plt.grid(ls="--")
@@ -47,7 +47,7 @@ def plot_fluorescent_lines_double(y2, lines2, lines_fit2, saveto=None):
             plt.plot(lines_fit[j], y+offset, color=c, path_effects=p_eff)
 
     plt.title("Locations of RGB maxima")
-    plt.xlabel("Line center [px]") # x
+    plt.xlabel("Line centre [px]") # x
     plt.ylabel("Row along spectrum [px]") # y
     plt.gca().invert_yaxis()
     plt.grid(ls="--")
@@ -66,7 +66,7 @@ def plot_fluorescent_lines_dispersion(y2, lines2, lines_fit2, dispersion2, savet
         axs[1].plot(dispersion, y+offset, color='k', lw=5)
 
     axs[0].set_title("Locations of RGB maxima")
-    axs[0].set_xlabel("Line center [px]") # x
+    axs[0].set_xlabel("Line centre [px]") # x
     axs[0].set_ylabel("Row along spectrum [px]") # y
     axs[0].invert_yaxis()
     axs[1].tick_params(axis="y", left=False)
