@@ -55,26 +55,26 @@ def plot_fluorescent_lines_double(y2, lines2, lines_fit2, saveto=None):
 
 
 def plot_fluorescent_lines_dispersion(y2, lines2, lines_fit2, dispersion2, saveto=None):
-    p_eff = [pe.Stroke(linewidth=5, foreground='k'), pe.Normal()]
+    p_eff = [pe.Stroke(linewidth=4, foreground='k'), pe.Normal()]
 
-    fig, axs = plt.subplots(ncols=2, figsize=(10, 3), gridspec_kw={"width_ratios": (4,1), "hspace": 0, "wspace": 0.05}, sharey=True)
+    fig, axs = plt.subplots(ncols=2, figsize=(5.1, 1.73), gridspec_kw={"width_ratios": (4,1), "hspace": 0, "wspace": 0.05}, sharey=True)
     for offset, y, lines, lines_fit, dispersion in zip(offsets, y2, lines2, lines_fit2, dispersion2):
         for j, c in enumerate(spectacle_plot.RGB_OkabeIto):
-            axs[0].scatter(lines[j], y+offset, s=25, color=c, alpha=0.8)
+            axs[0].scatter(lines[j], y+offset, s=15, color=c, alpha=0.8, rasterized=True)
             axs[0].plot(lines_fit[j], y+offset, color=c, path_effects=p_eff)
 
-        axs[1].plot(dispersion, y+offset, color='k', lw=5)
+        axs[1].plot(dispersion, y+offset, color='k', lw=3)
 
     axs[0].set_title("Locations of RGB maxima")
     axs[0].set_xlabel("Line centre [px]") # x
-    axs[0].set_ylabel("Row along spectrum [px]") # y
+    axs[0].set_ylabel("Row along\nspectrum [px]") # y
     axs[0].invert_yaxis()
     axs[1].tick_params(axis="y", left=False)
-    axs[1].set_xlabel("Dispersion [nm/px]")
+    axs[1].set_xlabel("Dispersion\n[nm/px]")
     for ax in axs:
         ax.grid(ls="--")
 
-    spectacle_plot.save_or_show(saveto)
+    spectacle_plot.save_or_show(saveto, dpi=400)
 
 
 def plot_bounding_boxes(data, label_file="", saveto="bounding_boxes.pdf", **kwargs):

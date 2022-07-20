@@ -105,8 +105,8 @@ print(f"Saved wavelength coefficients to '{save_to_Qp}' and '{save_to_Qm}'")
 wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
 wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 
-wavelengths_split_Qp, RGBG_Qp = raw.demosaick(bayer_Qp, wavelengths_Qp, data_Qp)
-wavelengths_split_Qm, RGBG_Qm = raw.demosaick(bayer_Qm, wavelengths_Qm, data_Qm)
+wavelengths_split_Qp, RGBG_Qp = raw.demosaick(bayer_Qp, [wavelengths_Qp, data_Qp])
+wavelengths_split_Qm, RGBG_Qm = raw.demosaick(bayer_Qm, [wavelengths_Qm, data_Qm])
 
 lambdarange, all_interpolated_Qp = wavelength.interpolate_multi(wavelengths_split_Qp, RGBG_Qp)
 lambdarange, all_interpolated_Qm = wavelength.interpolate_multi(wavelengths_split_Qm, RGBG_Qm)
