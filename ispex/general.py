@@ -15,8 +15,8 @@ def find_spectrum(data, device="iPhone SE"):
     # slice_Qm = np.s_[1750:2050]
 
     # SPIE paper
-    slice_Qp = np.s_[540:1400]
-    slice_Qm = np.s_[1480:2300]
+    slice_Qp = np.s_[650:1400]
+    slice_Qm = np.s_[1550:2300]
 
     return slice_Qp, slice_Qm
 
