@@ -267,6 +267,17 @@ plt.legend(loc="best")
 plt.savefig(Path("results")/f"{label_dataset}_Rrs_WISP.pdf", bbox_inches="tight")
 plt.close()
 
+# Correlation plots for Ed, Lsky, Lu
+Ed_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, E) for E in Ed])
+Lsky_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, L) for L in mean_sky_I])
+Lu_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, L) for L in mean_water_I])
+
+fig, axs = plt.subplots(ncols=3, figsize=(8,5))
+for ax, data_wisp, data_ispex in zip(axs, [wisp_ed, wisp_ls, wisp_lu], [Ed_wisp_lambda, Lsky_wisp_lambda, Lu_wisp_lambda]):
+    for j, c in enumerate("rgb"):
+        ax.scatter(data_wisp, data_ispex[j], c=c)
+plt.show()
+
 # Correlation plot for Rrs
 Rrs_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, R) for R in Rrs])
 MAD = np.nanmedian(np.abs(Rrs_wisp_lambda - wisp_rrs), axis=1)
