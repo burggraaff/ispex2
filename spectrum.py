@@ -3,7 +3,11 @@ from sys import argv
 from spectacle import plot, io, wavelength, raw, general, calibrate
 from ispex import general as ispex_general, plot as ispex_plot
 from matplotlib import pyplot as plt
+import matplotlib as mpl
 from pathlib import Path
+
+# Turn grid on by default
+mpl.rcParams.update({"axes.grid": True, "grid.linestyle": "--"})
 
 file = io.path_from_input(argv)
 
@@ -48,13 +52,13 @@ wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 wavelengths_split_Qp, RGBG_Qp, xp_split = raw.demosaick(bayer_Qp, [wavelengths_Qp, data_Qp, xp])
 wavelengths_split_Qm, RGBG_Qm, xm_split = raw.demosaick(bayer_Qm, [wavelengths_Qm, data_Qm, xm])
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(xm_split[j,50], RGBG_Qm[j,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(xm_split[j,50], RGBG_Qm[j,50], color=c)
 plt.xlabel("Pixel")
 plt.ylabel("Counts [ADU]")
-plt.grid(ls="--")
-plt.ylim(-5, RGBG_Qm[:,50,1000:].max()*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(0, x.shape[0])
 plt.savefig(Path("results")/f"{file.stem}_row_raw_Qm.pdf", bbox_inches="tight")
 plt.close()
@@ -63,13 +67,13 @@ plt.close()
 RGBG_Qp = general.gauss_filter_multidimensional(RGBG_Qp, sigma=(0,0,3))
 RGBG_Qm = general.gauss_filter_multidimensional(RGBG_Qm, sigma=(0,0,3))
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(xm_split[j,50], RGBG_Qm[j,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(xm_split[j,50], RGBG_Qm[j,50], color=c)
 plt.xlabel("Pixel")
 plt.ylabel("Counts [ADU]")
-plt.grid(ls="--")
-plt.ylim(-5, RGBG_Qm[:,50,1000:].max()*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(0, x.shape[0])
 plt.savefig(Path("results")/f"{file.stem}_row_gauss_Qm.pdf", bbox_inches="tight")
 plt.close()
@@ -77,24 +81,24 @@ plt.close()
 lambdarange, all_interpolated_Qp = wavelength.interpolate_multi(wavelengths_split_Qp, RGBG_Qp)
 lambdarange, all_interpolated_Qm = wavelength.interpolate_multi(wavelengths_split_Qm, RGBG_Qm)
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, all_interpolated_Qp[j,:,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(lambdarange, all_interpolated_Qp[j,:,50], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Counts [ADU]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(all_interpolated_Qp[...,50])*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_row_Qp.pdf", bbox_inches="tight")
 plt.close()
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, all_interpolated_Qm[j,:,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(lambdarange, all_interpolated_Qm[j,:,50], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Counts [ADU]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(all_interpolated_Qm[...,50])*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_row_Qm.pdf", bbox_inches="tight")
 plt.close()
@@ -112,7 +116,7 @@ plt.close()
 all_interpolated_Qp = all_interpolated_Qp / spectral_response_RGBG[...,np.newaxis]
 all_interpolated_Qm = all_interpolated_Qm / spectral_response_RGBG[...,np.newaxis]
 
-fig, axs = plt.subplots(nrows=2, figsize=(4,2), gridspec_kw={"hspace": 0.05, "wspace": 0}, sharex=True, sharey=True)
+fig, axs = plt.subplots(nrows=2, figsize=(5.1,1.3), gridspec_kw={"hspace": 0.05, "wspace": 0}, sharex=True, sharey=True)
 for ax, spectrum in zip(axs, [all_interpolated_Qp[1], all_interpolated_Qm[1]]):
     indices = np.linspace(spectrum.shape[1]*0.05, spectrum.shape[1]*0.95-1, 4).astype(int)
     for ind in indices:
@@ -120,31 +124,31 @@ for ax, spectrum in zip(axs, [all_interpolated_Qp[1], all_interpolated_Qm[1]]):
     ax.grid(ls="--")
     ax.set_yticks(np.arange(0,1400,500))
     ax.set_ylim(-5, 1400)
-axs[1].set_ylabel(" "*15+"Radiance [a.u.]")
+axs[1].set_ylabel(" "*12+"Radiance [a.u.]")
 axs[1].set_xlabel("Wavelength [nm]")
 axs[0].tick_params(axis="x", bottom=False)
 
 plt.savefig(Path("results")/f"{file.stem}_Qp_vs_Qm.pdf", bbox_inches="tight")
 plt.close()
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, all_interpolated_Qp[j,:,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(lambdarange, all_interpolated_Qp[j,:,50], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Radiance [a.u.]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(all_interpolated_Qp[...,50])*1.05)
+plt.ylim(-5, 1500)
+plt.yticks(np.arange(0,1501,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_row_norm_Qp.pdf", bbox_inches="tight")
 plt.close()
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, all_interpolated_Qm[j,:,50], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto):
+    plt.plot(lambdarange, all_interpolated_Qm[j,:,50], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Radiance [a.u.]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(all_interpolated_Qm[...,50])*1.05)
+plt.ylim(-5, 1500)
+plt.yticks(np.arange(0,1501,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_row_norm_Qm.pdf", bbox_inches="tight")
 plt.close()
@@ -152,24 +156,24 @@ plt.close()
 stacked_Qp = wavelength.stack(lambdarange, all_interpolated_Qp)
 stacked_Qm = wavelength.stack(lambdarange, all_interpolated_Qm)
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb", 1):
-    plt.plot(stacked_Qp[0], stacked_Qp[j], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto, 1):
+    plt.plot(stacked_Qp[0], stacked_Qp[j], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Radiance [a.u.]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(stacked_Qp[1:])*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_stacked_norm_Qp.pdf", bbox_inches="tight")
 plt.close()
 
-plt.figure(figsize=(6,2))
-for j, c in enumerate("rgb", 1):
-    plt.plot(stacked_Qm[0], stacked_Qm[j], c=c)
+plt.figure(figsize=(5.1,1.3))
+for j, c in enumerate(plot.RGB_OkabeIto, 1):
+    plt.plot(stacked_Qm[0], stacked_Qm[j], color=c)
 plt.xlabel("Wavelength [nm]")
 plt.ylabel("Radiance [a.u.]")
-plt.grid(ls="--")
-plt.ylim(-5, np.nanmax(stacked_Qm[1:])*1.05)
+plt.ylim(-5, 1250)
+plt.yticks(np.arange(0,1251,250))
 plt.xlim(390, 700)
 plt.savefig(Path("results")/f"{file.stem}_stacked_norm_Qm.pdf", bbox_inches="tight")
 plt.close()
