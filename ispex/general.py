@@ -10,9 +10,13 @@ def find_spectrum(data, device="iPhone SE"):
 
     Hardcoded for now
     """
+    # # WISP-3 comparison
+    # slice_Qp = np.s_[1000:1300]
+    # slice_Qm = np.s_[1750:2050]
 
-    slice_Qp = np.s_[1000:1300]
-    slice_Qm = np.s_[1750:2050]
+    # SPIE paper
+    slice_Qp = np.s_[540:1400]
+    slice_Qm = np.s_[1480:2300]
 
     return slice_Qp, slice_Qm
 
