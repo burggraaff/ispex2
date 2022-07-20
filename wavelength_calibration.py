@@ -58,8 +58,8 @@ ym = np.arange(data_Qm.shape[0])
 # Convolve the data with a Gaussian kernel on the wavelength axis to remove
 # noise and fill in the gaps
 # 1 pixel in RGBG space = 2 pixels in RGB space
-gauss_Qp = general.gauss_nan(RGB_Qp, sigma=(0,0,6))
-gauss_Qm = general.gauss_nan(RGB_Qm, sigma=(0,0,6))
+gauss_Qp = general.gauss_filter_multidimensional(RGB_Qp, sigma=(0,0,6))
+gauss_Qm = general.gauss_filter_multidimensional(RGB_Qm, sigma=(0,0,6))
 
 # Find the locations of the line peaks in every row
 x_offset = 1700
