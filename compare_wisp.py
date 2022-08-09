@@ -36,10 +36,10 @@ mean_grey, mean_sky, mean_water = [np.load(filename) for filename in filenames_i
 stds_grey, stds_sky, stds_water = [np.load(filename) for filename in filenames_ispex_std]
 
 # Bias correction
-mean_grey, mean_sky, mean_water = camera.correct_bias(mean_grey, mean_sky, mean_water)
+mean_grey, mean_sky, mean_water = camera.correct_bias([mean_grey, mean_sky, mean_water])
 
 # Flat-field correction
-mean_grey, mean_sky, mean_water = camera.correct_flatfield(mean_grey, mean_sky, mean_water)
+mean_grey, mean_sky, mean_water = camera.correct_flatfield([mean_grey, mean_sky, mean_water])
 
 # Slice the data
 slice_Qp, slice_Qm = ispex_general.find_spectrum(mean_grey)
@@ -67,12 +67,12 @@ wavelengths_Qp = wavelength.calculate_wavelengths(coefficients_Qp, x, yp)
 wavelengths_Qm = wavelength.calculate_wavelengths(coefficients_Qm, x, ym)
 
 # Demosaick the data and wavelength calibration data
-wavelengths_split_Qp, mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, xp_split = raw.demosaick(bayer_Qp, wavelengths_Qp, mean_grey_Qp, mean_sky_Qp, mean_water_Qp, xp)
-wavelengths_split_Qm, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG, xm_split = raw.demosaick(bayer_Qm, wavelengths_Qm, mean_grey_Qm, mean_sky_Qm, mean_water_Qm, xm)
+wavelengths_split_Qp, mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, xp_split = raw.demosaick(bayer_Qp, [wavelengths_Qp, mean_grey_Qp, mean_sky_Qp, mean_water_Qp, xp])
+wavelengths_split_Qm, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG, xm_split = raw.demosaick(bayer_Qm, [wavelengths_Qm, mean_grey_Qm, mean_sky_Qm, mean_water_Qm, xm])
 
 # Smooth the data in RGBG space
 # 1 pixel in RGBG space = 2 pixels in RGB space
-mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG = general.gauss_filter_multidimensional(mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG, sigma=(0,0,3))
+mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG = [general.gauss_filter_multidimensional(d, sigma=(0,0,3)) for d in [mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG]]
 
 # Plot the Qm data in a single row
 row = 50
