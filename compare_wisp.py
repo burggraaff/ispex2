@@ -1,5 +1,8 @@
 """
 Compare stacked images to WISP data.
+
+Example:
+    %run compare_wisp.py data/20200921_LHBP1/stacks/iSPEX_grey_iso1840_mean.npy data/20200921_LHBP1/wisp_Olivier_20201126.csv
 """
 
 import numpy as np
@@ -78,8 +81,8 @@ mean_grey_Qp_RGBG, mean_sky_Qp_RGBG, mean_water_Qp_RGBG, mean_grey_Qm_RGBG, mean
 row = 50
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
 for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_RGBG, mean_sky_Qm_RGBG, mean_water_Qm_RGBG], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax.plot(xm_split[j,row], RGBG_Qm[j,row], c=c)
+    for j, c in enumerate(plot.RGB_OkabeIto):
+        ax.plot(xm_split[j,row], RGBG_Qm[j,row], color=c)
     ax.set_ylabel(f"{label}\nCounts [ADU]")
     ax.grid(ls="--")
     ax.set_ylim(-5, RGBG_Qm[:,row,1000:].max()*1.05)
@@ -117,8 +120,7 @@ mean_water_Qm_nm = ispex_general.background_subtraction_spectrum(lambdarange, me
 row = 50
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
 for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax.plot(lambdarange, RGBG_Qm[j,:,row], c=c)
+    plot._rgbplot(lambdarange, RGBG_Qm[...,row], func=ax.plot)
     ax.set_ylabel(f"{label}\nCounts [ADU]")
     ax.grid(ls="--")
     ax.set_ylim(-5, RGBG_Qm[...,row].max()*1.05)
@@ -138,9 +140,9 @@ spectral_response_RGBG = np.stack([np.interp(lambdarange, spectral_response[0], 
 # Plot Qm data in nm and the SRF
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
 for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_nm, mean_sky_Qm_nm, mean_water_Qm_nm], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax.plot(lambdarange, RGBG_Qm[j,:,row], c=c)
-        ax.plot(lambdarange, spectral_response_RGBG[j]*RGBG_Qm[j,:,row].max()/spectral_response_RGBG[j].max(), c=c, ls="--")
+    SRF_normalised = spectral_response_RGBG * (RGBG_Qm[...,row].max(axis=1) / spectral_response_RGBG.max(axis=1))[..., np.newaxis]  # This would be much nicer if the axis order were reversed
+    plot._rgbplot(lambdarange, RGBG_Qm[...,row], func=ax.plot)
+    plot._rgbplot(lambdarange, SRF_normalised, func=ax.plot, ls="--")
     ax.set_ylabel(f"{label}\nCounts [ADU]")
     ax.grid(ls="--")
     ax.set_ylim(-5, RGBG_Qm[...,row].max()*1.05)
@@ -185,8 +187,7 @@ mean_grey_Qp_srf, mean_sky_Qp_srf, mean_water_Qp_srf, mean_grey_Qm_srf, mean_sky
 # Plot the Qm data in a single row, SRF-calibrated
 fig, axs = plt.subplots(nrows=3, figsize=(6,6), sharex=True)
 for ax, RGBG_Qm, label in zip(axs, [mean_grey_Qm_srf, mean_sky_Qm_srf, mean_water_Qm_srf], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax.plot(lambdarange, RGBG_Qm[j,:,row], c=c)
+    plot._rgbplot(lambdarange, RGBG_Qm[...,row], func=ax.plot)
     ax.set_ylabel(f"{label}\nCounts [rel. ADU]")
     ax.grid(ls="--")
     ax.set_ylim(-5, np.nanmax(RGBG_Qm[...,row])*1.05)
@@ -207,11 +208,9 @@ mean_grey_I, mean_sky_I, mean_water_I = mean_grey_Qp + mean_grey_Qm, mean_sky_Qp
 # Plot the stacked -Q, +Q, I data
 fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(8,6), sharex=True, sharey="row")
 for ax_row, RGBG_Qp, RGBG_Qm, RGBG_I, label in zip(axs, [mean_grey_Qp, mean_sky_Qp, mean_water_Qp], [mean_grey_Qm, mean_sky_Qm, mean_water_Qm], [mean_grey_I, mean_sky_I, mean_water_I], ["Grey card", "Sky", "Water"]):
-    for j, c in enumerate("rgb"):
-        ax_row[0].plot(lambdarange, RGBG_Qm[j], c=c)
-        ax_row[1].plot(lambdarange, RGBG_Qp[j], c=c)
-        ax_row[2].plot(lambdarange, RGBG_I[j]/2., c=c)
-        ax_row[0].set_ylabel(f"{label}\nCounts [rel. ADU]")
+    for ax, data in zip(ax_row, [RGBG_Qm, RGBG_Qp, RGBG_I/2.]):
+        plot._rgbplot(lambdarange, data, func=ax.plot)
+    ax_row[0].set_ylabel(f"{label}\nCounts [rel. ADU]")
     for ax in ax_row:
         ax.grid(ls="--")
         ymax = 1.05 * np.nanmax([RGBG_Qm, RGBG_Qp, RGBG_I/2.])
@@ -231,14 +230,13 @@ plt.close()
 mean_grey_I[mean_grey_I <= 0] = np.nan
 
 # Calculate R_Rs naively
-Ed = np.pi / 0.23 * mean_grey_I
+Ed = np.pi / 0.18 * mean_grey_I
 Lw = mean_water_I - 0.028 * mean_sky_I
 Rrs = Lw / Ed
 
 # Plot Rrs
 ymax = np.nanmax(Rrs) * 1.05
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, Rrs[j], c=c)
+plot._rgbplot(lambdarange, Rrs)
 plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
 plt.xlim(390, 710)
 plt.ylim(0, ymax)
@@ -252,10 +250,10 @@ plt.close()
 wisp_wavelengths, wisp_lu, wisp_lu_err, wisp_ls, wisp_ls_err, wisp_ed, wisp_ed_err, wisp_rrs, wisp_rrs_err = validation.load_wisp_data(filename_wisp)
 
 # Compare Rrs plots
-ymax = np.nanmax([ymax, wisp_rrs.max()])
+ymax = np.nanmax([np.nanmax(Rrs), np.nanmax(wisp_rrs)])*1.05
 plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3", lw=2)
-for j, c in enumerate("rgb"):
-    plt.plot(lambdarange, Rrs[j], c=c, label=f"iSPEX 2 {c}", lw=2)
+for j, (c, pc) in enumerate(zip(plot.RGB, plot.RGB_OkabeIto)):
+    plt.plot(lambdarange, Rrs[j], color=pc, label=f"iSPEX 2 {c}", lw=2)
 plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
 plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
 plt.xlim(390, 800)
@@ -263,24 +261,45 @@ plt.ylim(0, ymax)
 plt.grid(ls="--")
 plt.xlabel("Wavelength [nm]")
 plt.title(f"Remote sensing reflectance ({label_dataset})")
-plt.legend(loc="best")
+plt.legend(loc="best", facecolor="white", edgecolor='k', framealpha=1)
 plt.savefig(Path("results")/f"{label_dataset}_Rrs_WISP.pdf", bbox_inches="tight")
 plt.close()
 
+# Normalise smartphone data to WISP-3 data
+Rrs_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, R) for R in Rrs])  # Smartphone data interpolated to WISP-3 wavelengths
+median_factor = np.nanmedian(Rrs_wisp_lambda / wisp_rrs)
+print(f"Median ratio of iSPEX 2 / WISP-3: {100*median_factor:.1f}%")
+Rrs_rescaled = Rrs / median_factor
+
+ymax = np.nanmax([np.nanmax(Rrs_rescaled), np.nanmax(wisp_rrs)])*1.05
+plt.figure(figsize=(5,3))
+for j, (c, pc) in enumerate(zip(plot.RGB, plot.RGB_OkabeIto)):
+    plt.plot(lambdarange, Rrs_rescaled[j], color=pc, label=f"iSPEX 2 {c}", lw=2)
+plt.plot(wisp_wavelengths, wisp_rrs, c='k', label="WISP-3", lw=1)
+plt.fill_between(wisp_wavelengths, wisp_rrs-wisp_rrs_err, wisp_rrs+wisp_rrs_err, facecolor="0.75", alpha=0.75)
+plt.ylabel("$R_{rs}$ [sr$^{-1}$]")
+plt.xlim(390, 800)
+plt.ylim(0, ymax)
+plt.grid(ls="--")
+plt.xlabel("Wavelength [nm]")
+plt.title(f"Remote sensing reflectance ({label_dataset})")
+plt.legend(loc="best", facecolor="white", edgecolor='k', framealpha=1)
+plt.savefig(Path("results")/f"{label_dataset}_Rrs_WISP_normalised.pdf", bbox_inches="tight")
+plt.close()
+
 # Correlation plot for Rrs
-Rrs_wisp_lambda = np.array([np.interp(wisp_wavelengths, lambdarange, R) for R in Rrs])
 MAD = np.nanmedian(np.abs(Rrs_wisp_lambda - wisp_rrs), axis=1)
 MADrel = np.nanmedian(np.abs((Rrs_wisp_lambda - wisp_rrs)/Rrs_wisp_lambda), axis=1) * 100
 
 plt.figure(figsize=(5,5))
-for j, c in enumerate("rgb"):
+for j, (c, pc) in enumerate(zip(plot.RGB, plot.RGB_OkabeIto)):
     label = (f"{c}: MAD = {MAD[j]:.4f} " "sr$^{-1}$" f" / {MADrel[j]:.1f} %")
     # plt.errorbar(wisp_rrs, Rrs_wisp_lambda[j], xerr=wisp_rrs_err, c=c, fmt="o")
-    plt.scatter(wisp_rrs, Rrs_wisp_lambda[j], c=c, label=label)
-plt.plot([-1, 1], [-1, 1], c='k', ls="--")
+    plt.scatter(wisp_rrs, Rrs_wisp_lambda[j], color=pc, label=label)
+plt.plot([-1, 1], [-1, 1], c='k')
 plt.xlabel("$R_{rs}$ WISP-3 [sr$^{-1}$]")
 plt.ylabel("$R_{rs}$ iSPEX 2 [sr$^{-1}$]")
-plt.legend(loc="best")
+plt.legend(loc="best", facecolor="white", edgecolor='k', framealpha=1)
 plt.grid(ls="--")
 plt.xlim(-1e-3, ymax)
 plt.ylim(-1e-3, ymax)
